@@ -1,0 +1,308 @@
+<html>
+<head>
+  <style media="screen">
+    * {
+      font-family: "Comic Sans MS" !important;
+    }
+
+    html, body {
+      margin: 0;
+    }
+
+    body {
+      --width: calc(100vh / 9 * 16);
+      --height: 100vh;
+
+      width: var(--width);
+      height: var(--height);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    p {
+      margin: 0;
+    }
+
+    div.content {
+      width: var(--width);
+      height: var(--height);
+      background-color: black;
+      color: white;
+
+      display: flex;
+      align-items: center;
+      flex-direction: column;
+    }
+
+    @media (max-aspect-ratio: 16/9) {
+      body {
+        --width: 100vw;
+        --height: calc(100vw * 9 / 16);
+      }
+    }
+
+    div.top {
+      height: calc(5 / 6 * 100%);
+      display: flex;
+    }
+
+    div.top-content {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      z-index: 1;
+    }
+
+    div.bottom {
+      width: 100%;
+      height: calc(1 / 6 * 100%);
+      background-color: #007eff;
+      display: block;
+    }
+
+    img.jmss-logo {
+      height: 20%;
+    }
+
+    div.spacer {
+      height: 5%;
+    }
+
+    span.time {
+      font-family: "Liberation Sans";
+      font-size: calc(var(--height) * 0.12);
+    }
+
+    div.room-info {
+      margin-top: calc(var(--height) * 0.03);
+    }
+
+    div.issues {
+      margin-top: calc(var(--height) * 0.015);
+      font-size: calc(var(--height) * 0.02);
+    }
+
+    div.bottom, div.bottom > div {
+      display: flex;
+      align-content: center;
+      justify-content: center;
+      font-family: "Futura"
+    }
+
+    div.bottom {
+      flex-direction: column;
+    }
+
+    div.room-code {
+      margin-right: auto;
+      width: calc(var(--width) * 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    div.room-code img {
+      height: calc(var(--height) * 0.03);
+    }
+
+    div.room-code span {
+      font-size: calc(var(--height) * 0.04);
+      margin-left: calc(var(--width) * 0.01);
+    }
+
+    div.room-number {
+      font-size: calc(var(--height) * 0.05);
+    }
+
+    div.vivi-logo {
+      margin-left: auto;
+      width: calc(var(--width) * 0.15);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    div.vivi-logo img {
+      height: calc(var(--height) * 0.06);
+    }
+
+    img.kermond {
+      position: absolute;
+      z-index: 0;
+      top: 0;
+      left: 0;
+
+      --size: calc(var(--height) * 0.3);
+
+      width: var(--size);
+      height: var(--size);
+    }
+  </style>
+
+  <script>
+    function zPad(str) {
+      return ('00' + str.toString()).slice(-2)
+    }
+
+    window.addEventListener('load', () => {
+      let days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
+      let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+      function setTime() {
+        let now = new Date()
+        let dateString = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${1900 + now.getYear()}`
+        let timeString = `${zPad(now.getHours())}:${zPad(now.getMinutes())}:${zPad(now.getSeconds())} ${now.getHours() >= 12 ? 'pm' : 'am'}`
+        document.getElementById('date').textContent = dateString
+        document.getElementById('time').textContent = timeString
+      }
+
+      setTime()
+      setInterval(setTime, 1000)
+    })
+
+    window.addEventListener('load', () => {
+      let kermond = document.getElementById('kermond')
+      let computedBody = getComputedStyle(document.body)
+      let computedKerj = getComputedStyle(kermond)
+
+      let boundX = parseInt(computedBody.width.slice(0, -2))
+      let boundY = parseInt(computedBody.height.slice(0, -2)) * 5 / 6
+
+      let size = parseInt(computedKerj.width.slice(0, -2))
+
+      let sizeBoundX = boundX - size
+      let sizeBoundY = boundY - size
+
+      let pi = Math.PI
+
+      let angle = Math.random() * (pi / 4 - pi / 6) + pi / 6
+      if (Math.random() > 0.5) {
+        angle = pi - angle
+      }
+      if (Math.random() > 0.5) {
+        angle += pi
+      }
+
+      let x = boundX / 2 - size / 2, y = boundY / 2 - size / 2
+      let v = 5
+
+      let pictures = ['kerj-2012', 'kerj', 'kerj-mask', 'albd']
+      let currentPic = 0
+
+      function isHeadingUpwards() {
+        return ieq(pi, angle, 2*pi)
+      }
+
+      function isHeadingLeft() {
+        return ieq(pi/2, angle, 3*pi/2)
+      }
+
+      function ieq(l, a, h) {
+        return l < a && a < h
+      }
+
+      function basicAngle(a) {
+        return a % (pi/4)
+      }
+
+      function onBounce() {
+        currentPic++
+        if (currentPic === pictures.length) currentPic = 0
+        kermond.src = 'teachers/' + pictures[currentPic] + '.png'
+
+        let delta = Math.random() * 0.1
+        if (Math.random() < 0.5) delta *= -1
+        angle += delta
+      }
+
+      function animate() {
+        let newX = x + v * Math.cos(angle)
+        let newY = y + v * Math.sin(angle)
+
+        let needsBounce = false
+
+        let up = isHeadingUpwards()
+        let left = isHeadingLeft()
+
+        if (newY < 0 || newY > sizeBoundY) {
+          if (up) {
+            newX = x - y / Math.tan(angle)
+            newY = 0
+          } else {
+            newX = x - (sizeBoundY - y) / Math.tan(angle)
+            newY = sizeBoundY
+          }
+
+          angle = -angle
+
+          onBounce()
+        }
+
+        if (newX < 0 || newX > sizeBoundX) {
+          if (left) {
+            newX = 0
+            newY = y - x * Math.tan(angle)
+          } else {
+            newX = sizeBoundX
+            newY = y + (sizeBoundX - x) * Math.tan(angle)
+          }
+
+          angle = pi - angle
+
+          onBounce()
+        }
+
+        angle %= 2*pi
+        if (angle < 0) angle += 2*pi
+
+        kermond.style.top = newY
+        kermond.style.left = newX
+
+        x = newX
+        y = newY
+
+        requestAnimationFrame(animate)
+      }
+
+      requestAnimationFrame(animate)
+
+      let audio = new Audio()
+      audio.src = 'jeopardy.mp3'
+      audio.loop = true
+      audio.play()
+    })
+  </script>
+</head>
+<body>
+  <div class="content">
+    <div class="top">
+      <div class="top-content">
+        <img src="jmss.svg" class="jmss-logo" />
+        <div class="spacer"></div>
+        <span class="time" id="date"></span>
+        <span class="time" id="time"></span>
+      </div>
+      <img id="kermond" class="kermond x y" src="teachers/kerj-2012.png" />
+    </div>
+    <div class="bottom">
+      <div class="room-info">
+        <div class="room-code">
+          <img src="lock.svg" />
+          <span>7910</span>
+        </div>
+        <div class="room-number">
+          1B1 / 1B2
+        </div>
+        <div class="vivi-logo">
+          <img src="vivi logo.svg" />
+        </div>
+      </div>
+      <div class="issues">
+        <span>Report any whiteboard hacking to:&nbsp;</span>
+        <span style="text-decoration: underline;">john.kermond@jmss.vic.edu.au</span>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
