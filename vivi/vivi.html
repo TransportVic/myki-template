@@ -152,7 +152,7 @@
       function setTime() {
         let now = new Date()
         let dateString = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]} ${1900 + now.getYear()}`
-        let timeString = `${zPad(now.getHours())}:${zPad(now.getMinutes())}:${zPad(now.getSeconds())} ${now.getHours() >= 12 ? 'pm' : 'am'}`
+        let timeString = `${now.getHours() % 12}:${zPad(now.getMinutes())}:${zPad(now.getSeconds())} ${now.getHours() >= 12 ? 'pm' : 'am'}`
         document.getElementById('date').textContent = dateString
         document.getElementById('time').textContent = timeString
       }
